@@ -20,14 +20,6 @@ const app = express()
 
 app.use(express.json())
 
-app.use((req, res, next) => {
-  res.cookie("test", "working", "token",{
-    httpOnly: true,
-    secure: true, 
-    sameSite: "none",                              
-  });
-  next();
-});
 const allowedOrigins = [
   "https://teststudent.topjoloo.com",   
   "http://teststudent.topjoloo.com",
@@ -46,6 +38,17 @@ app.use(cors({
   credentials: true
 }));
 
+app.use(cookieParser())
+
+app.use((req, res, next) => {
+  res.cookie("test", "working", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  })
+  next()
+})
+
 
 app.use(process.env.API_VERSION, authRoute)
 app.use(process.env.API_VERSION, lessonRoute)
@@ -63,3 +66,4 @@ app.listen(3000, () => {
     console.log("APP LISTENING: 3000")
 
 })
+
