@@ -5,7 +5,7 @@ const LOGOUT = async (req, res) => {
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      sameSite: "lax",
     });
 
     return res.status(200).json({
@@ -19,3 +19,4 @@ const LOGOUT = async (req, res) => {
 };
 
 module.exports = LOGOUT;
+
