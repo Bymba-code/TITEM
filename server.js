@@ -20,12 +20,30 @@ const app = express()
 
 app.use(express.json())
 
-app.use(cookieParser())
+app.use((req, res, next) => {
+  res.cookie("test", "working", "token",{
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", 
+    sameSite: "none",                              
+  });
+  next();
+});
+const allowedOrigins = [
+  "https://teststudent.topjoloo.com",   
+  "http://teststudent.topjoloo.com",
+  "http://localhost:5173"
+]
 
 app.use(cors({
-  origin: "http://localhost:5173",
-  methods: ["GET", "POST", "PUT", "DELETE"], 
-  credentials: true 
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error("CORS blocked"))
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
 }));
 
 
