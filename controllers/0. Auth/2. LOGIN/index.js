@@ -63,7 +63,7 @@ const LOGIN_STUDENT = async (req , res) => {
         res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production", 
-            sameSite: "none",
+            sameSite: "lax",
             maxAge: 1000 * 60 * 60 * 24 * 7, 
         })
 
@@ -78,5 +78,6 @@ const LOGIN_STUDENT = async (req , res) => {
         returnCatchedError(err, res)
     }
 }
+
 
 module.exports = LOGIN_STUDENT
