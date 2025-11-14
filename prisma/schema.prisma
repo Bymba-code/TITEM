@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model lessons {
+  id                    Int                     @id @default(autoincrement())
+  name                  String?                 @db.VarChar(55)
+  index                 Int?
+  exp                   Float?                  @db.Float
+  date                  DateTime?               @db.Timestamp(0)
+  buleg                 buleg[]
+  users_lesson_progress users_lesson_progress[]
+}
+
+model buleg {
+  id                                                     Int                    @id @default(autoincrement())
+  lesson                                                 Int?
+  name                                                   String?                @db.VarChar(150)
+  index                                                  Int?
+  exp                                                    Float?                 @db.Float
+  progress                                               Float?                 @db.Float
+  date                                                   DateTime?              @db.Timestamp(0)
+  lessons                                                lessons?               @relation(fields: [lesson], references: [id], onDelete: Cascade, map: "buleg_to_lesson")
+  topic_topic_bulegTobuleg                               topic[]                @relation("topic_bulegTobuleg")
+  users_buleg_progress_users_buleg_progress_bulegTobuleg users_buleg_progress[] @relation("users_buleg_progress_bulegTobuleg")
+
+  @@index([lesson], map: "buleg_to_lesson_idx")
+}
+
+model topic {
+  id                                                     Int                    @id @default(autoincrement())
+  buleg                                                  Int?
+  name                                                   String?                @db.VarChar(150)
+  index                                                  Int?
+  exp                                                    Float?                 @db.Float
+  progress                                               Float?                 @db.Float
+  date                                                   DateTime?              @db.Timestamp(0)
+  buleg_topic_bulegTobuleg                               buleg?                 @relation("topic_bulegTobuleg", fields: [buleg], references: [id], onDelete: Cascade, map: "topic_to_buleg")
+  topic_content_topic_content_topicTotopic               topic_content[]        @relation("topic_content_topicTotopic")
+  topic_test_topic_test_topicTotopic                     topic_test[]           @relation("topic_test_topicTotopic")
+  users_topic_progress_users_topic_progress_topicTotopic users_topic_progress[] @relation("users_topic_progress_topicTotopic")
+
+  @@index([buleg], map: "topic_to_buleg_idx")
+}
+
+model topic_content {
+  id                                                                   Int                   @id @default(autoincrement())
+  topic                                                                Int?
+  content                                                              String?               @db.LongText
+  type                                                                 Int?
+  index                                                                Int?
+  date                                                                 DateTime?             @db.Timestamp(0)
+  topic_topic_content_topicTotopic                                     topic?                @relation("topic_content_topicTotopic", fields: [topic], references: [id], onDelete: Cascade, map: "topic_content_to_topic")
+  topic_content_image_topic_content_image_topic_contentTotopic_content topic_content_image[] @relation("topic_content_image_topic_contentTotopic_content")
+
+  @@index([topic], map: "topic_content_to_topic_idx")
+}
+
+model topic_test {
+  id                            Int       @id @default(autoincrement())
+  topic                         Int?
+  image                         String?   @db.VarChar(255)
+  name                          String?   @db.VarChar(155)
+  date                          DateTime? @db.Timestamp(0)
+  topic_topic_test_topicTotopic topic?    @relation("topic_test_topicTotopic", fields: [topic], references: [id], onDelete: Cascade, map: "topic_test_to_topic")
+
+  @@index([topic], map: "topic_test_to_topic_idx")
+}
+
+model users {
+  id                    Int                     @id @default(autoincrement())
+  firstname             String?                 @db.VarChar(45)
+  lastname              String?                 @db.VarChar(45)
+  username              String?                 @db.VarChar(45)
+  password              String?                 @db.VarChar(255)
+  date                  DateTime?               @db.Timestamp(0)
+  users_buleg_progress  users_buleg_progress[]
+  users_exp             users_exp[]
+  users_lesson_progress users_lesson_progress[]
+  users_level           users_level[]
+  users_topic_progress  users_topic_progress[]
+}
+
+model users_topic_progress {
+  id                                      Int       @id @default(autoincrement())
+  user                                    Int?
+  topic                                   Int?
+  progress                                Float?    @db.Float
+  completed                               Int?
+  date                                    DateTime? @db.Timestamp(0)
+  topic_users_topic_progress_topicTotopic topic?    @relation("users_topic_progress_topicTotopic", fields: [topic], references: [id], onDelete: Cascade, map: "user_topic_progress_to_topic")
+  users                                   users?    @relation(fields: [user], references: [id], onDelete: Cascade, map: "user_topic_progress_to_user")
+
+  @@index([topic], map: "user_topic_progress_to_topic_idx")
+  @@index([user], map: "user_topic_progress_to_user_idx")
+}
+
+model users_lesson_progress {
+  id        Int       @id @default(autoincrement())
+  lesson    Int?
+  user      Int?
+  progress  Float?    @db.Float
+  completed Int?
+  date      DateTime? @db.Timestamp(0)
+  lessons   lessons?  @relation(fields: [lesson], references: [id], onDelete: Cascade, map: "user_lesson_progress_to_lessons")
+  users     users?    @relation(fields: [user], references: [id], onDelete: Cascade, map: "user_lesson_progress_to_user")
+
+  @@index([lesson], map: "user_lesson_progress_to_user_idx")
+  @@index([user], map: "user_lesson_progress_to_user_idx1")
+}
+
+model topic_content_image {
+  id                                                             Int            @id @default(autoincrement())
+  topic_content                                                  Int?
+  image                                                          String?        @db.VarChar(255)
+  tailbar                                                        String?        @db.VarChar(255)
+  date                                                           DateTime?      @db.Timestamp(0)
+  topic_content_topic_content_image_topic_contentTotopic_content topic_content? @relation("topic_content_image_topic_contentTotopic_content", fields: [topic_content], references: [id], onDelete: Cascade, map: "topic_content_image_to_topic_content")
+
+  @@index([topic_content], map: "topic_content_image_to_topic_content_idx")
+}
+
+model users_buleg_progress {
+  id                                      Int       @id @default(autoincrement())
+  user                                    Int?
+  buleg                                   Int?
+  progress                                Float?    @db.Float
+  completed                               Int?
+  date                                    DateTime? @db.Timestamp(0)
+  buleg_users_buleg_progress_bulegTobuleg buleg?    @relation("users_buleg_progress_bulegTobuleg", fields: [buleg], references: [id], onDelete: Cascade, map: "user_buleg_progress_to_buleg")
+  users                                   users?    @relation(fields: [user], references: [id], onDelete: Cascade, map: "user_buleg_progress_to_user")
+
+  @@index([buleg], map: "user_buleg_progress_to_buleg_idx")
+  @@index([user], map: "user_buleg_progress_to_user_idx")
+}
+
+model ranks {
+  id           Int     @id @default(autoincrement())
+  rank_title   String? @db.VarChar(55)
+  min_level    Int?
+  max_level    Int?
+  required_exp Float?  @db.Float
+}
+
+model users_exp {
+  id     Int       @id @default(autoincrement())
+  user   Int?
+  exp    Float?    @db.Float
+  reason String?   @db.VarChar(255)
+  date   DateTime? @db.Timestamp(0)
+  users  users?    @relation(fields: [user], references: [id], onDelete: Cascade, map: "users_exp_to_user")
+
+  @@index([user], map: "users_exp_to_user_idx")
+}
+
+model users_level {
+  id          Int       @id @default(autoincrement())
+  user        Int?
+  level       Int?
+  exp         Float?    @db.Float
+  achieved_at DateTime? @db.Timestamp(0)
+  users       users?    @relation(fields: [user], references: [id], onDelete: Cascade, map: "users_level_to_user")
+
+  @@index([user], map: "users_level_to_user_idx")
+}
+
+model levels {
+  id           Int    @id @default(autoincrement())
+  level        Int?
+  required_exp Float? @db.Float
+}
